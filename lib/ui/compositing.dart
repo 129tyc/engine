@@ -87,6 +87,10 @@ class TransformEngineLayer extends _EngineLayerWrapper {
   TransformEngineLayer._(EngineLayer nativeLayer) : super._(nativeLayer);
 }
 
+class FrozenEngineLayer extends _EngineLayerWrapper{
+  FrozenEngineLayer._(EngineLayer nativeLayer) : super._(nativeLayer);
+}
+
 /// An opaque handle to an offset engine layer.
 ///
 /// Instances of this class are created by [SceneBuilder.pushOffset].
@@ -310,6 +314,21 @@ class SceneBuilder extends NativeFieldWrapperClass2 {
   }
 
   void _pushOffset(EngineLayer layer, double dx, double dy) native 'SceneBuilder_pushOffset';
+
+  FrozenEngineLayer? pushFrozen(
+    int id,
+    bool invalid, {
+    FrozenEngineLayer? oldLayer,
+  }) {
+    assert(_debugCheckCanBeUsedAsOldLayer(oldLayer, 'pushFrozen'));
+    final engineLayer = EngineLayer._();
+    _pushFrozen(engineLayer, id, invalid);
+    final layer = FrozenEngineLayer._(engineLayer);
+    assert(_debugPushLayer(layer));
+    return layer;
+  }
+
+  void _pushFrozen(EngineLayer layer, int id, bool invalid) native 'SceneBuilder_pushFrozen';
 
   /// Pushes a rectangular clip operation onto the operation stack.
   ///

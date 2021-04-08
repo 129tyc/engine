@@ -21,6 +21,7 @@
 #include "flutter/flow/layers/shader_mask_layer.h"
 #include "flutter/flow/layers/texture_layer.h"
 #include "flutter/flow/layers/transform_layer.h"
+#include "flutter/flow/layers/frozen_layer.h"
 #include "flutter/fml/build_config.h"
 #include "flutter/lib/ui/painting/matrix.h"
 #include "flutter/lib/ui/painting/shader.h"
@@ -45,6 +46,7 @@ IMPLEMENT_WRAPPERTYPEINFO(ui, SceneBuilder);
 
 #define FOR_EACH_BINDING(V)                         \
   V(SceneBuilder, pushOffset)                       \
+  V(SceneBuilder, pushFrozen)                       \
   V(SceneBuilder, pushTransform)                    \
   V(SceneBuilder, pushClipRect)                     \
   V(SceneBuilder, pushClipRRect)                    \
@@ -88,6 +90,12 @@ SceneBuilder::SceneBuilder() {
 }
 
 SceneBuilder::~SceneBuilder() = default;
+
+void SceneBuilder::pushFrozen(Dart_Handle layer_handle, int id, bool invalid) {
+    auto layer = std::make_shared<flutter::FrozenLayer>(id, invalid);
+    PushLayer(layer);
+    EngineLayer::MakeRetained(layer_handle, layer);
+}
 
 void SceneBuilder::pushTransform(Dart_Handle layer_handle,
                                  tonic::Float64List& matrix4) {

@@ -38,6 +38,8 @@ class SceneBuilder : public RefCountedDartWrappable<SceneBuilder> {
   }
   ~SceneBuilder() override;
 
+  void pushFrozen(Dart_Handle layer_handle, int id, bool freeze);
+  void pushDrawCache(Dart_Handle layer_handle, int cacheId);
   void pushTransform(Dart_Handle layer_handle, tonic::Float64List& matrix4);
   void pushOffset(Dart_Handle layer_handle, double dx, double dy);
   void pushClipRect(Dart_Handle layer_handle,

@@ -50,6 +50,8 @@ source_set("flow") {
     "layers/texture_layer.h",
     "layers/transform_layer.cc",
     "layers/transform_layer.h",
+    "layers/frozen_layer.cc",
+    "layers/frozen_layer.h",
     "matrix_decomposition.cc",
     "matrix_decomposition.h",
     "paint_utils.cc",
