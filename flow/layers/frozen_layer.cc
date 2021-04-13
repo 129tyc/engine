@@ -41,8 +41,8 @@ namespace flutter {
             auto frozenTexture = static_cast<FrozenTexture *>(existedTexture.get());
             FML_DLOG(ERROR)
             << "check re invalid, curr " << marker << " old " << frozenTexture->marker << " destroyed "
-            << frozenTexture->release_context->destroyed << " translate " << matrix.getTranslateX() << " "
-            << matrix.getTranslateY();
+            << frozenTexture->release_context->destroyed << " rect " << frozenTexture->cache_rect.width() << " "
+            << frozenTexture->cache_rect.height();
 
             if (frozenTexture->marker == marker || frozenTexture->release_context->destroyed) {
                 SkRect child_paint_bounds = SkRect::MakeEmpty();
@@ -83,8 +83,7 @@ namespace flutter {
         << rect.fTop;
         if (bounds.width() != rect.width() || bounds.height() != rect.height() ||
             frozenTexture->release_context->destroyed) {
-            FML_DLOG(ERROR) << "existed texture size not match or destroyed" << "unregister and re init";
-//             flutter::FrozenTexture::ReleaseTexture(frozenTexture->release_context.get());
+            FML_DLOG(ERROR) << "existed texture size not match or destroyed, unregister and re init";
             context->texture_registry.UnregisterTexture(this->texture_identifier);
 
             TryInitSnapshot(context, matrix);
@@ -226,9 +225,14 @@ namespace flutter {
             FML_DLOG(ERROR) << "ctx not existed";
             return;
         }
-        FML_DLOG(ERROR) << "delete texture";
+
         auto releaseCtx = static_cast<FrozenTexture::ReleaseContext *>(ctx);
-//        releaseCtx->context->deleteBackendTexture(releaseCtx->texture);
+        if(releaseCtx->destroyed){
+            FML_DLOG(ERROR) << "already destroyed, skip twice";
+            return;
+        }
+
+        FML_DLOG(ERROR) << "mark texture destroyed";
         releaseCtx->destroyed = true;
     }
 
@@ -243,12 +247,10 @@ namespace flutter {
 
     void FrozenTexture::OnGrContextDestroyed() {
         FML_DLOG(ERROR) << "OnGrContextDestroyed";
-        release_context->destroyed = true;
     }
 
     void FrozenTexture::OnTextureUnregistered() {
         FML_DLOG(ERROR) << "OnTextureUnregistered";
-        release_context->destroyed = true;
     }
 
 }  // namespace flutter
